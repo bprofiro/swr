@@ -1,21 +1,37 @@
-import { StatusBar } from 'expo-status-bar';
+/* eslint-disable camelcase */
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import AppLoading from 'expo-app-loading';
+
+import {
+  Archivo_400Regular,
+  Archivo_700Bold,
+  useFonts,
+} from '@expo-google-fonts/archivo';
+import {
+  Poppins_400Regular,
+  Poppins_600SemiBold,
+} from '@expo-google-fonts/poppins';
+
+import { Users } from './src/pages/Users';
+
+import { SearchProvider } from './src/hooks/useSearch';
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Archivo_400Regular,
+    Archivo_700Bold,
+    Poppins_400Regular,
+    Poppins_600SemiBold,
+  });
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SearchProvider>
+      <Users />
+      <StatusBar style="light" />
+    </SearchProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
