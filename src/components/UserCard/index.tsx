@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { UserProps, useSearch } from '../../hooks/useSearch';
+import { UserProps } from '../../hooks/useSearch';
 
 import {
   Container,
@@ -14,34 +14,28 @@ import {
 } from './styles';
 
 interface UserCardProps {
-  user: UserProps;
+  user: UserProps | undefined;
 }
 
-export const UserCard = ({ user }: UserCardProps) => {
-  const { errorMessage } = useSearch();
+export const UserCard = ({ user }: UserCardProps) => (
+  <Container>
+    <Cover />
+    <UserImage source={{ uri: user?.avatar_url }} />
 
-  return errorMessage ? (
-    <Username>{errorMessage}</Username>
-  ) : (
-    <Container>
-      <Cover />
-      <UserImage source={{ uri: user.avatar_url }} />
+    <Username>{user?.name}</Username>
 
-      <Username>{user.name}</Username>
+    <UserDescription>{user?.bio}</UserDescription>
 
-      <UserDescription>{user.bio}</UserDescription>
+    <UserDetails>
+      <Item>
+        <ItemText>{user?.followers}</ItemText>
+        <ItemText>Followers</ItemText>
+      </Item>
 
-      <UserDetails>
-        <Item>
-          <ItemText>{user.followers}</ItemText>
-          <ItemText>Followers</ItemText>
-        </Item>
-
-        <Item>
-          <ItemText>{user.public_repos}</ItemText>
-          <ItemText>Repos</ItemText>
-        </Item>
-      </UserDetails>
-    </Container>
-  );
-};
+      <Item>
+        <ItemText>{user?.public_repos}</ItemText>
+        <ItemText>Repos</ItemText>
+      </Item>
+    </UserDetails>
+  </Container>
+);
