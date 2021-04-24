@@ -1,22 +1,56 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import { FlatList } from 'react-native';
+
+import { useNavigation } from '@react-navigation/native';
 
 import { Header } from '../../components/Header';
-import { UserCard } from '../../components/UserCard';
-import { UserCardFallback } from '../../components/UserCardFallback';
+import { useFecth } from '../../hooks/useFetch';
+
+import {
+  Container,
+  Content,
+  Title,
+  UserCard,
+  UserImage,
+  Button,
+  TextButton,
+  PaginationContainer,
+  PaginateButton,
+} from './styles';
 import { useSearch } from '../../hooks/useSearch';
 
-import { Container, Content, Title } from './styles';
+interface UserFromGithub {
+  avatar_url: string;
+  login: string;
+  id: string;
+}
 
 export const Users = () => {
-  const { user, loading } = useSearch();
+  const navigation = useNavigation();
 
-  if (!user.name && !loading) {
+  const { setUsername } = useSearch();
+
+  const [page, setPage] = useState(0);
+
+  const { data: users } = useFecth<UserFromGithub[]>(
+    `https://api.github.com/users?since=${page}&per_page=200`,
+  );
+
+  const handleGoToDetails = useCallback(
+    username => {
+      setUsername(username);
+      navigation.navigate('UserDetails');
+    },
+    [setUsername, navigation],
+  );
+
+  if (!users) {
     return (
       <Container>
         <Header />
 
         <Content>
-          <Title>Submit User</Title>
+          <Title>Loading...</Title>
         </Content>
       </Container>
     );
@@ -27,13 +61,41 @@ export const Users = () => {
       <Header />
 
       <Content>
-        <Title>User Detail</Title>
+        <Title>Users</Title>
 
-        {loading ? (
-          <UserCardFallback userName="User" />
-        ) : (
-          <UserCard user={user} />
-        )}
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={users}
+          style={{
+            maxHeight: 570,
+          }}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <UserCard key={item.id}>
+              <UserImage
+                source={{
+                  uri: item.avatar_url,
+                }}
+              />
+
+              <Button onPress={() => handleGoToDetails(item.login)}>
+                <TextButton>Ver detalhes</TextButton>
+              </Button>
+            </UserCard>
+          )}
+        />
+
+        <PaginationContainer>
+          <PaginateButton
+            onPress={() => setPage(prevState => prevState - 21)}
+            disabled={page === 0}
+          >
+            <TextButton>Anterior</TextButton>
+          </PaginateButton>
+          <PaginateButton onPress={() => setPage(prevState => prevState + 21)}>
+            <TextButton>Proxima</TextButton>
+          </PaginateButton>
+        </PaginationContainer>
       </Content>
     </Container>
   );
