@@ -1,12 +1,4 @@
-import React, {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useState,
-} from 'react';
-
-import { fetchGithubUser } from '../services/userService';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 export interface UserProps {
   name: string;
@@ -21,40 +13,19 @@ interface SearchProviderProps {
 }
 
 interface SearchContextData {
-  user: UserProps;
-  loading: boolean;
-  errorMessage: string;
-  search: (username: string) => Promise<void>;
+  username: string;
+  setUsername: (username: string) => void;
 }
 
 const SearchContext = createContext<SearchContextData>({} as SearchContextData);
 export function SearchProvider({ children }: SearchProviderProps) {
-  const [user, setUser] = useState<UserProps>({} as UserProps);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const search = useCallback(async (userName: string) => {
-    setLoading(true);
-
-    try {
-      const response = await fetchGithubUser(userName);
-
-      setErrorMessage('');
-      setUser(response);
-    } catch (err) {
-      setErrorMessage('User not found');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const [username, setUsername] = useState('');
 
   return (
     <SearchContext.Provider
       value={{
-        user,
-        search,
-        loading,
-        errorMessage,
+        username,
+        setUsername,
       }}
     >
       {children}
@@ -66,7 +37,7 @@ export function useSearch(): SearchContextData {
   const context = useContext(SearchContext);
 
   if (!context) {
-    throw new Error('useSearch must be used within an AuthProvider');
+    throw new Error('useSearch must be used within an SearchProvider');
   }
   return context;
 }
