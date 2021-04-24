@@ -13,8 +13,7 @@ import {
   Poppins_600SemiBold,
 } from '@expo-google-fonts/poppins';
 
-import { Users } from './src/pages/Users';
-
+import { AppStack } from './src/routes/AppStack';
 import { SearchProvider } from './src/hooks/useSearch';
 
 export default function App() {
@@ -30,7 +29,7 @@ export default function App() {
   }
   return (
     <SearchProvider>
-      <Users />
+      <AppStack />
       <StatusBar style="light" />
     </SearchProvider>
   );
